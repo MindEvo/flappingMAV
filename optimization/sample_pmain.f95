@@ -7,7 +7,7 @@ USE PVTdirect_MOD  ! The module for pVTdirect.
 IMPLICIT NONE
 
 ! Local variables.
-CHARACTER(len=13) :: nmlfile ! Name list file name.  
+CHARACTER(len=22) :: nmlfile ! Name list file name.  
 CHARACTER(len=2), DIMENSION(5) :: objnm ! Objective function short names.
 INTEGER :: bin ! Number of evaluations per task.
 INTEGER :: chkpt_start ! Checkpointing method option given 
@@ -117,7 +117,7 @@ Xresults(:,:) = reshape((/0.0, 0.0, 0.0,0.0, 0.0,&
 ! Call pVTdirect subroutine to optimize the specified test function.
 ! Read the namelists for the current 'test_opt'. This serves as an
 ! example of varying input parameters at run-time for calling pVTdirect.
-nmlfile = 'pdirect'//objnm(test_opt)//'.nml'
+nmlfile = 'parallel/pdirect'//objnm(test_opt)//'.nml'
 OPEN(UNIT=111, FILE=nmlfile, IOSTAT=ierr)
 IF (ierr /= 0) THEN
   CLOSE(UNIT=111)
