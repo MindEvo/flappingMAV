@@ -17,9 +17,29 @@ software was found.
 
 ## Delta
 
-How do we log into Delta?
+Secure copy files from local machine to remote server
+```
+# open a new terminal that is on your local machine
+scp -r /dir/of/folder/to/copy <username>@login.delta.ncsa.illinois.edu:~
+```
 
-How do we run a job on Delta?
+Running project
+```
+# ssh into server
+ssh <username>@login.delta.ncsa.illinois.edu
+
+# go into directory with code
+cd ~/flappingMAV/optimization
+
+# compile code
+mpif90 -g -O -o pmain shared_modules.f95 pVTdirect.f95 sample_pmain.f95
+
+# request resources
+srun -A bbrx-delta-gpu --time=00:30:00 --partition=gpuA40x4-interactive --nodes=1 --ntasks-per-node=16 --gpus-per-node=1 --mem=32g --pty /bin/bash
+
+# run binary
+./pmain
+```
 
 ## DIRECT Search Algorithm
 A search algorithm that searches for coordinates (i.e. inputs) in a sample set
