@@ -1,6 +1,6 @@
 ! This file (sample_pmain.f95) contains a program that calls pVTdirect,
 ! the parallel implementation of DIRECT, to optimize one 
-! objective function (UVLM) defined in objfunc.f95.
+! objective function (CL) defined in objfunc.f95.
 
 PROGRAM SAMPLE_PMAIN
 USE PVTdirect_MOD  ! The module for pVTdirect.
@@ -55,7 +55,7 @@ TYPE(HyperBox), DIMENSION(:), ALLOCATABLE :: box_set ! An empty array of TYPE
 
 ! Procedure interfaces for objective functions.
 INTERFACE
-  FUNCTION  Obj_UVLM(c, proc_id, iflag) RESULT(f)
+  FUNCTION  Obj_CL(c, proc_id, iflag) RESULT(f)
     USE REAL_PRECISION, ONLY : R8
     REAL(KIND = R8), DIMENSION(:), INTENT(IN):: c
     INTEGER, INTENT(IN):: proc_id
@@ -82,7 +82,7 @@ test_opt = 1
 ! Negin: I think Fresults and Xresults should be removed,
 ! since we do not have the results in advance.
 
-objnm = 'UVLM'
+objnm = 'CL'
 Nv = 5
 
 
@@ -164,7 +164,7 @@ IF (n_optbox == 1) THEN ! A single best box output is specified.
       ! Initialization.
       CALL pVTdirect_init(ierr)
       IF (ierr == 0) THEN
-        CALL pVTdirect(N, L, U, Obj_UVLM, X, FMIN, proc_id, status, &
+        CALL pVTdirect(N, L, U, Obj_CL, X, FMIN, proc_id, status, &
           SWITCH=c_switch, MAX_ITER=iter_lim, MAX_EVL=eval_lim, &
           MIN_DIA=diam_lim, OBJ_CONV=objf_conv, EPS=eps_fmin, W=Wa, &
           N_SUB=n_subdomains, N_MASTER=n_masters, BINSIZE=bin, &
@@ -183,7 +183,7 @@ IF (n_optbox == 1) THEN ! A single best box output is specified.
       ! Initialization.
       CALL pVTdirect_init(ierr)
       IF (ierr == 0) THEN
-        CALL pVTdirect(N, L, U, Obj_UVLM, X, FMIN, proc_id, status, &
+        CALL pVTdirect(N, L, U, Obj_CL, X, FMIN, proc_id, status, &
           SWITCH=c_switch, MAX_ITER=iter_lim, MAX_EVL=eval_lim, &
           MIN_DIA=diam_lim, OBJ_CONV=objf_conv, EPS=eps_fmin, W=Wa, &
           N_SUB=n_subdomains, N_MASTER=n_masters, BINSIZE=bin, &
