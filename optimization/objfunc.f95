@@ -1,6 +1,5 @@
-! This file (objfunc.f95) contains five test objective functions for
-! both VTdirect and pVTdirect.
-!
+!INCLUDE "mpif.h"     ! MPI library functions.
+! This file (objfunc.f95) contains one objective function (UVLM) for pVTdirect.
 
 ! For all the objective functions:
 ! On input:
@@ -11,15 +10,14 @@
 ! iflag - A flag that is used to indicate the status of the
 !         function evaluation. It is 0 for normal status.
 !
-! Obj_GR: Griewank function.
-! The function formula is
-! f(c) = 1+sum(c(i)^2/d)-product(cos(c(i)/sqrt(i))),
-! where d = 500.0 (a bigger d value gives more local minima) and
-! i is the summation index ranging from 1 to N (the number of
-! dimensions). The global minimum is f(c)=0 at c(:)=(0,...,0), when c
-! is in [-20, 30]^N.
+! Obj_UVLM:
+! This function minimizes the lift-to-drag ratio (L/D) 
+! of a Flapping Micro Air Vehicle
+! obj_UVLM = min(lift/drag)
 !
-FUNCTION  Obj_GR(c, iflag) RESULT(f)
+
+
+FUNCTION  Obj_UVLM(c, proc_id, iflag) RESULT(f)
 USE REAL_PRECISION, ONLY : R8
 IMPLICIT NONE
 
@@ -28,20 +26,70 @@ REAL(KIND = R8), DIMENSION(:), INTENT(IN):: c
 INTEGER, INTENT(OUT):: iflag
 REAL(KIND = R8):: f
 
+INTEGER, INTENT(IN):: proc_id
+character (len=8) :: test_name
+CHARACTER(len=30) :: filename
+CHARACTER(len=60) :: fn1
+CHARACTER(len=60) :: fn2
+CHARACTER(len=60) :: fn3
+CHARACTER(len=60) :: fn4
+CHARACTER(len=60) :: fn5
 ! Local variables.
 INTEGER:: i
-REAL(KIND = R8):: d
-REAL(KIND = R8)::prod
+INTEGER:: unt1
+INTEGER:: iostat
+LOGICAL:: opened
 
-! Assign a value to 'd'.
-d = 500.0_R8
-! Compute the product.
-prod = 1.0_R8
-DO i = 1, SIZE(c)
-  prod = prod * COS( c(i)/SQRT(REAL(i,KIND=R8)) )
-END DO
-f = 1.0_R8 + DOT_PRODUCT(c,c) / d - prod
+! Abhishek: Update PAR(n) n=dimension
+REAL*8::PAR(5)
+     write (test_name, '( "test_", I3.3)' ) proc_id
+     call system ( "mkdir " //test_name)
+! Abhishek: Change DO i=2,N when using N parameter optimization
+! c(1) is the water radius and c(i=2,6) are the sum of water radius and the
+! atomic radius, therefore one must pass the difference in the input parameters
+! c(7) is tau parameter in CHAGB
+
+PAR(1)=c(1)             ! water radius
+DO i=2,5
+PAR(i) = c(i) -c(1)     ! atomic radii
+ENDDO 
+
+!filename = ''//test_name//"/param.txt"
+     write (filename, '( "test_",I3.3,"/param.txt")' ) proc_id
+     write (fn1, '( "cp TestRadii.sh ./test_",I3.3,"/.")' ) proc_id
+     write (fn2, '( "cd test_",I3.3," ; ./TestRadii.sh ; cd ..")' ) proc_id
+     write (fn3, '( "cat test_",I3.3,"/par.rms.dat >> par.rms.dat")' ) proc_id
+     write (fn4, '( "rm -rf test_",I3.3)' ) proc_id
+     write (fn5, '( "test_",I3.3,"/rms.dat")' ) proc_id
+! Check if unit is open
+      do unt1 = 17,1,-1
+         inquire (unit=unt1, opened=opened, iostat=iostat)
+         if (iostat.ne.0) cycle
+         if (.not.opened) exit
+      end do
+
+OPEN (UNIT=unt1,FILE=filename,ACTION="write",STATUS="replace")
+! Abhishek: Change DO i=1,N when using N parameter optimization
+DO i=1,5
+  WRITE(unt1,*) PAR(i)
+!  WRITE(*,*) PAR(i)
+ENDDO
+CLOSE (unt1)
+call system (""//fn1)
+call system (""//fn2)
+! Check if UNIT is open      
+do unt1 = 17,1,-1
+    inquire (unit=unt1, opened=opened, iostat=iostat)
+    if (iostat.ne.0) cycle
+    if (.not.opened) exit
+end do
+OPEN(UNIT=unt1,FILE=fn5)
+  READ(unt1,*) f
 iflag = 0
+CLOSE (unt1)
+call system (""//fn3)
+call system (""//fn4)
+call system (""//fn4)
 
 RETURN
-END FUNCTION Obj_GR
+END FUNCTION Obj_UVLM

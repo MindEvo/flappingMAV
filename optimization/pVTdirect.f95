@@ -310,14 +310,6 @@ IMPLICIT NONE
 INTEGER, INTENT(IN) :: N
 REAL(KIND = R8), DIMENSION(:), INTENT(INOUT) :: L
 REAL(KIND = R8), DIMENSION(:), INTENT(INOUT) :: U
-INTERFACE
-  FUNCTION OBJ_FUNC(C, IFLAG) RESULT(F)
-    USE REAL_PRECISION, ONLY : R8
-    REAL(KIND = R8), DIMENSION(:), INTENT(IN) :: C
-    INTEGER, INTENT(OUT) :: IFLAG
-    REAL(KIND = R8) :: F
-  END FUNCTION OBJ_FUNC
-END INTERFACE
 REAL(KIND = R8), DIMENSION(:), INTENT(OUT) :: X
 REAL(KIND = R8), INTENT(OUT) :: FMIN
 INTEGER, INTENT(OUT) :: PROCID
@@ -336,6 +328,15 @@ INTEGER, INTENT(INOUT), OPTIONAL :: N_SUB
 INTEGER, INTENT(INOUT), OPTIONAL :: N_MASTER
 INTEGER, INTENT(IN), OPTIONAL :: RESTART
 INTEGER, INTENT(IN), OPTIONAL:: BINSIZE
+INTERFACE
+  FUNCTION OBJ_FUNC(C, PROCID, IFLAG) RESULT(F)
+    USE REAL_PRECISION, ONLY : R8
+    REAL(KIND = R8), DIMENSION(:), INTENT(IN) :: C
+    INTEGER, INTENT(IN) :: PROCID
+    INTEGER, INTENT(OUT) :: IFLAG
+    REAL(KIND = R8) :: F
+  END FUNCTION OBJ_FUNC
+END INTERFACE
 
 ! Local variables.
 CHARACTER(len=30) :: cpfile, cpfile1, cpfile2 ! Strings for filenames.
@@ -512,7 +513,6 @@ IF (ierr /= MPI_SUCCESS) THEN
   RETURN
 END IF
 PROCID = myid
-
 ! Perform sanity check of input arguments and set local variables derived
 ! from input arguments.
 STATUS(1) = sanitycheck()
@@ -2244,7 +2244,7 @@ IF (role == 0) THEN ! The root subdomain master.
   ELSE ! Evaluate objective function at 'c'.
     ! Store the function value and initialize 'FMIN_I' at root.
     iflag = 0
-    FMIN_I = OBJ_FUNC(L + b%M(1,1)%c(:)*UmL, iflag)
+    FMIN_I = OBJ_FUNC(L + b%M(1,1)%c(:)*UmL, myid, iflag)
     ! Check the iflag to deal with undefined function values.
     IF (iflag /= 0) THEN
       ! It is evaluated at an undefined point, so assign it a huge value.
@@ -3859,7 +3859,7 @@ DO i = 1, setB%ind
       END IF
     END IF
   ELSE ! A normal evaluation.
-    setB%Line(i)%val = OBJ_FUNC(L + setB%Line(i)%c*UmL, iflag)
+    setB%Line(i)%val = OBJ_FUNC(L + setB%Line(i)%c*UmL, myid, iflag)
 
     ! Check 'iflag'.
     IF (iflag /= 0) THEN
@@ -4413,7 +4413,7 @@ OUTER: DO
           ! Extract a set of point coordinates.
           tmpc(:) = buffer(3+(i-1)*N:(i-1)*N+N+2)
           ! Put the function value to the buffer.
-          buffer(3+(i-1)*2) = OBJ_FUNC(tmpc, iflag)
+          buffer(3+(i-1)*2) = OBJ_FUNC(tmpc, myid, iflag)
           ! 'iflag' is stored after the function value.
           buffer(4+(i-1)*2) = iflag
         END DO
@@ -4434,7 +4434,7 @@ OUTER: DO
         ! Evaluate the points in the task.
         DO i = 1, INT(buffer(2))
           tmpc(:) = buffer(3+(i-1)*N:(i-1)*N+N+2)
-          buffer(3+(i-1)*2) = OBJ_FUNC(tmpc, iflag)
+          buffer(3+(i-1)*2) = OBJ_FUNC(tmpc, myid, iflag)
           buffer(4+(i-1)*2) = iflag
         END DO
         ! Return the function value(s).
