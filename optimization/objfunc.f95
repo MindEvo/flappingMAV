@@ -11,9 +11,9 @@
 !         function evaluation. It is 0 for normal status.
 !
 ! Obj_UVLM:
-! This function minimizes the lift-to-drag ratio (L/D) 
+! This function maximize the mean value of the lift coeffecient (mean(C_L))
 ! of a Flapping Micro Air Vehicle
-! obj_UVLM = min(lift/drag)
+! obj_UVLM = max(mean(C_L))
 !
 
 
