@@ -11,6 +11,15 @@ import pterasoftware as ps
 # would point upwards, out of your chair. These directions form a right-handed
 # coordinate system.
 
+# Define the flapping motions of the wing.
+# amplitudes of flapping motion
+AMP_X = 1.5
+AMP_Y = 0.5
+AMP_THETA = 45.0
+# phase of flapping motion
+PHI_X = 180
+PHI_Y = 180
+
 # Create an airplane object.
 ornithopter = ps.geometry.Airplane(
     name="Hummingbird",
@@ -247,7 +256,7 @@ main_wing_movement = ps.movement.WingMovement(
     ],
 
     # Define the amplitude of the leading edge's change in x position (meters).
-    x_le_amplitude=0.0,
+    x_le_amplitude=AMP_X,
 
     # Define the period of the leading edge's change in x position (seconds)
     x_le_period=0.0,
@@ -257,7 +266,7 @@ main_wing_movement = ps.movement.WingMovement(
     x_le_spacing="sine",
 
     # Define the amplitude of the leading edge's change in y position (meters).
-    y_le_amplitude=0.0,
+    y_le_amplitude=AMP_Y,
 
     # Define the period of the leading edge's change in y position (seconds)
     y_le_period=0.0,
@@ -444,6 +453,7 @@ uvlm_solver.run(
     prescribed_wake=True,
 )
 
+"""
 # Call the software's draw function on the solver.
 # Press "q" to close the plotter after it draws the output.
 ps.output.draw(
@@ -495,4 +505,10 @@ ps.output.plot_results_versus_time(
     # Set the show attribute to True.
     show=True,
     save=False,
+)
+"""
+
+ps.output.print_unsteady_results(
+    # Set the unsteady solver to the one we just ran.
+    unsteady_solver=uvlm_solver,
 )
