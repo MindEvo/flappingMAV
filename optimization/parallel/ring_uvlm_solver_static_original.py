@@ -11,6 +11,9 @@ import pterasoftware as ps
 # would point upwards, out of your chair. These directions form a right-handed
 # coordinate system.
 
+# Settings that were changed from the default values are commented with
+# "FlappingMAV setting".
+
 # Define the flapping motions of the wing.
 # amplitudes of flapping motion
 AMP_X = 0.0
@@ -98,15 +101,15 @@ ornithopter = ps.geometry.Airplane(
                     num_spanwise_panels=8,
                     spanwise_spacing="uniform",
 
-                    # Set the chord of this cross section to be 1.75 meters.
-                    chord=1.75,
+                    # Set the chord of this cross section to be 1.00 meters.
+                    chord=1.00,     # FlappingMAV setting
 
                     # Every wing cross section has an airfoil object.
                     airfoil=ps.geometry.Airfoil(
                         # Give the airfoil a name.
                         # This name should correspond to a name in the airfoil
                         # directory or a NACA four series airfoil.
-                        name="naca2412",
+                        name="ag03",
 
                         # Define a custom airfoil. Leave as None to use an
                         # airfoil from the airfoil directory.
@@ -130,40 +133,7 @@ ornithopter = ps.geometry.Airplane(
                     twist=5.0,
                     # Give this wing cross section an airfoil.
                     airfoil=ps.geometry.Airfoil(
-                        name="naca2412",
-                    ),
-                ),
-            ],
-        ),
-
-        # Define the next wing.
-        ps.geometry.Wing(
-            name="V-Tail",
-            x_le=6.75,
-            z_le=0.25,
-            num_chordwise_panels=6,
-            chordwise_spacing="uniform",
-            symmetric=True,
-            # Define this wing's root wing cross section.
-            wing_cross_sections=[
-                ps.geometry.WingCrossSection(
-                    chord=1.5,
-                    # Give the root wing cross section an airfoil.
-                    airfoil=ps.geometry.Airfoil(
-                        name="naca0012",
-                    ),
-                    twist=-5.0,
-                ),
-                # Define the wing's tip wing cross section.
-                ps.geometry.WingCrossSection(
-                    x_le=0.5,
-                    y_le=2.0,
-                    z_le=1.0,
-                    chord=1.0,
-                    twist=-5.0,
-                    # Give the tip wing cross section an airfoil.
-                    airfoil=ps.geometry.Airfoil(
-                        name="naca0012",
+                        name="ag03",
                     ),
                 ),
             ],
@@ -191,14 +161,13 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
     # first wing cross section, this must be 0.0 degrees.
     sweeping_amplitude=0.0,
 
-    # Define the sweeping period. This value is in degrees. As this is the
+    # Define the sweeping period. is in degrees. As this is the
     # first wing cross section, this must be 0.0 seconds.
     sweeping_period=0.0,
 
     # Define the time step spacing of the sweeping.
     # The options are "sine" and "uniform".
     sweeping_spacing="sine",
-
 
     # Define the pitching amplitude. This value is in degrees. As this is the
     # first wing cross section, this must be 0.0 degrees.
@@ -229,18 +198,6 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
 # static geometry, the movement attributes can be excluded.
 main_wing_tip_wing_cross_section_movement = ps.movement.WingCrossSectionMovement(
     base_wing_cross_section=ornithopter.wings[0].wing_cross_sections[1],
-)
-
-# Define the v-tail's root wing cross section's movement. As the example has
-# static geometry, the movement attributes can be excluded.
-v_tail_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovement(
-    base_wing_cross_section=ornithopter.wings[1].wing_cross_sections[0],
-)
-
-# Define the v-tail's tip wing cross section's movement. As the example has
-# static geometry, the movement attributes can be excluded.
-v_tail_tip_wing_cross_section_movement = ps.movement.WingCrossSectionMovement(
-    base_wing_cross_section=ornithopter.wings[1].wing_cross_sections[1],
 )
 
 # Define the main wing's movement. In addition to their wing cross sections'
@@ -291,30 +248,13 @@ main_wing_movement = ps.movement.WingMovement(
 del main_wing_root_wing_cross_section_movement
 del main_wing_tip_wing_cross_section_movement
 
-# Make the v-tail's wing movement object.
-v_tail_movement = ps.movement.WingMovement(
-    # Define the base wing object.
-    base_wing=ornithopter.wings[1],
-
-    # Add the list of wing cross section movement objects.
-    wing_cross_sections_movements=[
-        v_tail_root_wing_cross_section_movement,
-        v_tail_tip_wing_cross_section_movement,
-    ],
-)
-
-# Delete the extraneous wing cross section movement objects, as these are now
-# contained within the wing movement object.
-del v_tail_root_wing_cross_section_movement
-del v_tail_tip_wing_cross_section_movement
-
 # Define the airplane's movement object.
 airplane_movement = ps.movement.AirplaneMovement(
     # Define the base airplane object.
     base_airplane=ornithopter,
 
     # Add the list of wing movement objects.
-    wing_movements=[main_wing_movement, v_tail_movement],
+    wing_movements=[main_wing_movement],
 
     # Define the amplitude of the reference position's change in x position
     # (meters).
@@ -359,7 +299,6 @@ airplane_movement = ps.movement.AirplaneMovement(
 # Delete the extraneous wing movement objects, as these are now contained
 # within the airplane movement object.
 del main_wing_movement
-del v_tail_movement
 
 # Define a new operating point object. This defines the state at which the airplane
 # object is operating.
