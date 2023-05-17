@@ -15,12 +15,38 @@ https://arc.aiaa.org/doi/10.2514/6.2010-9355
 Unfortunately, the study does not have accompanying code and therefore other
 software was found.
 
-## Delta
+## Dependencies
 
-Secure copy files from local machine to remote server
+#### PteraSoftware
+```
+# if system offers pip or pip3
+pip install pterasoftware
+```
+
+## Delta
+To run this project on Delta, you need to upload all the files from here and
+the PteraSoftware UVLM simulation files.
+
+WARNING: Does not work on Delta
+
+PteraSoftware
+```
+# download zip
+wget https://github.com/camUrban/PteraSoftware/archive/refs/heads/release-3.0.0.zip
+
+# unzip
+unzip release-3.0.0.zip
+```
+
+Secure copy files from local machine to remote server.
 ```
 # open a new terminal that is on your local machine
-scp -r /dir/of/folder/to/copy <username>@login.delta.ncsa.illinois.edu:~
+# flappingMAV files
+scp -r /path/to/flappingMAV <username>@login.delta.ncsa.illinois.edu:~
+
+# pterasoftware files
+# pterasoftware is a directory inside PteraSoftware-release-3.0.0
+scp -r /path/to/pterasoftware <username>@login.delta.ncsa.illinois.edu:~
 ```
 
 Running project
@@ -31,14 +57,11 @@ ssh <username>@login.delta.ncsa.illinois.edu
 # go into directory with code
 cd ~/flappingMAV/optimization
 
-# compile code
-mpif90 -g -O -o pmain shared_modules.f95 pVTdirect.f95 sample_pmain.f95
-
 # request resources
 srun -A bbrx-delta-gpu --time=00:30:00 --partition=gpuA40x4-interactive --nodes=1 --ntasks-per-node=16 --gpus-per-node=1 --mem=32g --pty /bin/bash
 
-# run binary
-./pmain
+# run VTDIRECT95 on optimization problem
+./run.sh
 ```
 
 ## DIRECT Search Algorithm
