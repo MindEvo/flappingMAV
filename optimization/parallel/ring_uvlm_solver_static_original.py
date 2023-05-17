@@ -62,7 +62,7 @@ ornithopter = ps.geometry.Airplane(
 
             # Define the number of chordwise panels on the wing, and the
             # spacing between them.
-            num_chordwise_panels=6,
+            num_chordwise_panels=8,    # FlappingMAV setting
             chordwise_spacing="uniform",
 
             # List the wing cross sections that comprise this wing. Each wing
@@ -81,7 +81,7 @@ ornithopter = ps.geometry.Airplane(
                     # The twist is about the leading edge.
                     # Positive twist corresponds to positive rotation about the
                     # y axis, as defined by the right-hand rule.
-                    twist=0.0,
+                    twist=0.0,     # FlappingMAV setting
 
                     # Define the type of control surface. The options are
                     # "symmetric" and "asymmetric". This is only applicable if
@@ -129,8 +129,8 @@ ornithopter = ps.geometry.Airplane(
                     x_le=0.75,
                     y_le=6.0,
                     z_le=1.0,
-                    chord=1.5,
-                    twist=5.0,
+                    chord=1.0,     # FlappingMAV setting
+                    twist=0.0,    # FlappingMAV setting
                     # Give this wing cross section an airfoil.
                     airfoil=ps.geometry.Airfoil(
                         name="ag03",
@@ -161,8 +161,8 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
     # first wing cross section, this must be 0.0 degrees.
     sweeping_amplitude=0.0,
 
-    # Define the sweeping period. is in degrees. As this is the
-    # first wing cross section, this must be 0.0 seconds.
+    # Define the sweeping period. As this is the first wing cross section, this
+    # must be 0.0 seconds.
     sweeping_period=0.0,
 
     # Define the time step spacing of the sweeping.
@@ -194,10 +194,18 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
     heaving_spacing="sine",
 )
 
-# Define the main wing's tip wing cross section's movement. As the example has
-# static geometry, the movement attributes can be excluded.
+# Define the main wing's tip wing cross section's movement.
 main_wing_tip_wing_cross_section_movement = ps.movement.WingCrossSectionMovement(
     base_wing_cross_section=ornithopter.wings[0].wing_cross_sections[1],
+    sweeping_amplitude=0.0,
+    sweeping_period=0,
+    sweeping_spacing="sine",
+    pitching_amplitude=15.0,
+    pitching_period=1.0,
+    pitching_spacing="sine",
+    heaving_amplitude=0.0,
+    heaving_period=0.0,
+    heaving_spacing="sine",
 )
 
 # Define the main wing's movement. In addition to their wing cross sections'
@@ -213,7 +221,7 @@ main_wing_movement = ps.movement.WingMovement(
     ],
 
     # Define the amplitude of the leading edge's change in x position (meters).
-    x_le_amplitude=AMP_X,
+    x_le_amplitude=0.0,
 
     # Define the period of the leading edge's change in x position (seconds)
     x_le_period=0.0,
@@ -223,7 +231,7 @@ main_wing_movement = ps.movement.WingMovement(
     x_le_spacing="sine",
 
     # Define the amplitude of the leading edge's change in y position (meters).
-    y_le_amplitude=AMP_Y,
+    y_le_amplitude=0.0,
 
     # Define the period of the leading edge's change in y position (seconds)
     y_le_period=0.0,
