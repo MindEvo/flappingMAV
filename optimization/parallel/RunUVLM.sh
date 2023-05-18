@@ -15,7 +15,7 @@ param=(`awk '{print $1}' < param.txt`)
 # set parameters for UVLM simulation
 AMP_X=${param[0]}
 AMP_Y=${param[1]}
-AMP_THETA=${param[2]}
+AMP_ROT=${param[2]}
 PHI_X=${param[3]}
 PHI_Y=${param[4]}
 
@@ -25,7 +25,7 @@ cp ../ring_uvlm_solver_static_original.py ring_uvlm_solver_static.py
 # update the UVLM simulation file
 sed -i -e "s/AMP_X = 0.0/AMP_X = $AMP_X/g" ring_uvlm_solver_static.py
 sed -i -e "s/AMP_Y = 0.0/AMP_Y = $AMP_Y/g" ring_uvlm_solver_static.py
-sed -i -e "s/AMP_THETA = 0.0/AMP_THETA = $AMP_THETA/g" ring_uvlm_solver_static.py
+sed -i -e "s/AMP_ROT = 0.0/AMP_ROT = $AMP_ROT/g" ring_uvlm_solver_static.py
 sed -i -e "s/PHI_X = 0.0/PHI_X = $PHI_X/g" ring_uvlm_solver_static.py
 sed -i -e "s/PHI_Y = 0.0/PHI_Y = $PHI_Y/g" ring_uvlm_solver_static.py
 

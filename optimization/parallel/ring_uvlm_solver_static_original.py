@@ -14,14 +14,30 @@ import pterasoftware as ps
 # Settings that were changed from the default values are commented with
 # "FlappingMAV setting".
 
+# NOT possible to set phase angles of flapping motion
+
+# Simulation settings
+TIME_STEP = 0.02
+
+# Wing geometry settings
+CHORD_LENGTH = 1.0
+NUM_CHORDWISE_PANELS = 16
+NUM_SPANWISE_PANELS = 16
+
 # Define the flapping motions of the wing.
 # amplitudes of flapping motion
-AMP_X = 0.0
+AMP_X = 1.0
 AMP_Y = 0.0
-AMP_THETA = 0.0
+AMP_ROT = 40.0
+
 # phase of flapping motion
 PHI_X = 0.0
 PHI_Y = 0.0
+PHI_ROT = 3.14159/2
+
+# frequencies of flapping motion
+FREQ_X = 1.0
+FREQ_ROT = 1.0
 
 # Create an airplane object.
 ornithopter = ps.geometry.Airplane(
@@ -62,7 +78,7 @@ ornithopter = ps.geometry.Airplane(
 
             # Define the number of chordwise panels on the wing, and the
             # spacing between them.
-            num_chordwise_panels=8,    # FlappingMAV setting
+            num_chordwise_panels=NUM_CHORDWISE_PANELS,    # FlappingMAV setting
             chordwise_spacing="uniform",
 
             # List the wing cross sections that comprise this wing. Each wing
@@ -98,11 +114,11 @@ ornithopter = ps.geometry.Airplane(
 
                     # Define the number of spanwise panels on the wing cross
                     # section, and the spacing between them.
-                    num_spanwise_panels=8,
+                    num_spanwise_panels=NUM_SPANWISE_PANELS,
                     spanwise_spacing="uniform",
 
                     # Set the chord of this cross section to be 1.00 meters.
-                    chord=1.00,     # FlappingMAV setting
+                    chord=CHORD_LENGTH,     # FlappingMAV setting
 
                     # Every wing cross section has an airfoil object.
                     airfoil=ps.geometry.Airfoil(
@@ -129,7 +145,7 @@ ornithopter = ps.geometry.Airplane(
                     x_le=0.75,
                     y_le=6.0,
                     z_le=1.0,
-                    chord=1.0,     # FlappingMAV setting
+                    chord=CHORD_LENGTH,     # FlappingMAV setting
                     twist=0.0,    # FlappingMAV setting
                     # Give this wing cross section an airfoil.
                     airfoil=ps.geometry.Airfoil(
@@ -161,8 +177,8 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
     # first wing cross section, this must be 0.0 degrees.
     sweeping_amplitude=0.0,
 
-    # Define the sweeping period. As this is the first wing cross section, this
-    # must be 0.0 seconds.
+    # Define the sweeping period. This value is in seconds. As this is the 
+    # first wing cross section, this must be 0.0 seconds.
     sweeping_period=0.0,
 
     # Define the time step spacing of the sweeping.
@@ -173,7 +189,7 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
     # first wing cross section, this must be 0.0 degrees.
     pitching_amplitude=0.0,
 
-    # Define the pitching period. This value is in degrees. As this is the
+    # Define the pitching period. This value is in seconds. As this is the
     # first wing cross section, this must be 0.0 seconds.
     pitching_period=0.0,
 
@@ -185,7 +201,7 @@ main_wing_root_wing_cross_section_movement = ps.movement.WingCrossSectionMovemen
     # first wing cross section, this must be 0.0 degrees.
     heaving_amplitude=0.0,
 
-    # Define the heaving period. This value is in degrees. As this is the
+    # Define the heaving period. This value is in seconds. As this is the
     # first wing cross section, this must be 0.0 seconds.
     heaving_period=0.0,
 
@@ -200,8 +216,8 @@ main_wing_tip_wing_cross_section_movement = ps.movement.WingCrossSectionMovement
     sweeping_amplitude=0.0,
     sweeping_period=0,
     sweeping_spacing="sine",
-    pitching_amplitude=15.0,
-    pitching_period=1.0,
+    pitching_amplitude=AMP_ROT,
+    pitching_period=FREQ_ROT,
     pitching_spacing="sine",
     heaving_amplitude=0.0,
     heaving_period=0.0,
@@ -221,17 +237,17 @@ main_wing_movement = ps.movement.WingMovement(
     ],
 
     # Define the amplitude of the leading edge's change in x position (meters).
-    x_le_amplitude=0.0,
+    x_le_amplitude=AMP_X,
 
     # Define the period of the leading edge's change in x position (seconds)
-    x_le_period=0.0,
+    x_le_period=FREQ_X,
 
     # Define the time step spacing of the leading edge's change in x position.
     # The options are "sine" and "uniform".
     x_le_spacing="sine",
 
     # Define the amplitude of the leading edge's change in y position (meters).
-    y_le_amplitude=0.0,
+    y_le_amplitude=AMP_Y,
 
     # Define the period of the leading edge's change in y position (seconds)
     y_le_period=0.0,
@@ -365,7 +381,7 @@ movement = ps.movement.Movement(
     # static, the number of steps will be set such that three periods of the
     # slowest movement oscillation complete.
     num_steps=None,
-    delta_time=None,
+    delta_time=TIME_STEP,
 )
 
 # Delete the extraneous airplane and operating point movement objects, as these
@@ -400,7 +416,7 @@ uvlm_solver.run(
     prescribed_wake=True,
 )
 
-"""
+#"""
 # Call the software's draw function on the solver.
 # Press "q" to close the plotter after it draws the output.
 ps.output.draw(
@@ -453,7 +469,7 @@ ps.output.plot_results_versus_time(
     show=True,
     save=False,
 )
-"""
+#"""
 
 ps.output.print_unsteady_results(
     # Set the unsteady solver to the one we just ran.
